@@ -171,13 +171,15 @@ public class BTService extends Service implements LeScanCallback {
                     super.onCharacteristicChanged(gatt, characteristic);
                     LogModule.d("onCharacteristicChanged...");
                     byte[] data = characteristic.getValue();
-                    String[] formatDatas = Utils.formatData(data,
-                            characteristic);
-                    int header = Integer.valueOf(Utils
-                            .decodeToString(formatDatas[0]));
+                    String[] formatDatas = Utils.formatData(data, characteristic);
+                    int header = Integer.valueOf(Utils.decodeToString(formatDatas[0]));
                     if (header == BTConstants.HEADER_BACK_ACK) {
-                        int ack = Integer.valueOf(Utils
-                                .decodeToString(formatDatas[1]));
+                        int ack = Integer.valueOf(Utils.decodeToString(formatDatas[1]));
+                        SPUtiles.setStringValue(BTConstants.SP_KEY_DEVICE_VERSION,
+                                String.format("%s.%s.%s",
+                                        Utils.decodeToString(formatDatas[2]),
+                                        Utils.decodeToString(formatDatas[3]),
+                                        Utils.decodeToString(formatDatas[4])));
                         Intent intent = new Intent(BTConstants.ACTION_ACK);
                         intent.putExtra(BTConstants.EXTRA_KEY_ACK_VALUE, ack);
                         BTService.this.sendBroadcast(intent);
@@ -234,6 +236,13 @@ public class BTService extends Service implements LeScanCallback {
      */
     public void synSleep() {
         BTModule.setSleep(mBluetoothGatt);
+    }
+
+    /**
+     * 获取内部固件版本号
+     */
+    public void getVersion() {
+        BTModule.getVersion(mBluetoothGatt);
     }
 
     /**

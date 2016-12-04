@@ -29,7 +29,8 @@ public class BTConstants {
 	// sp
 	public static final String SP_NAME = "sp_name_sportsbracelet";
 	public static final String SP_KEY_DEVICE_ADDRESS = "sp_key_device_address";
-	public static final String SP_KEY_DEVICE_NAME = "sp_key_device_NAME";
+	public static final String SP_KEY_DEVICE_NAME = "sp_key_device_name";
+	public static final String SP_KEY_DEVICE_VERSION = "sp_key_device_version";
 	// Extra_key
 	/**
 	 * intent传值key
@@ -42,6 +43,8 @@ public class BTConstants {
 	 */
 	// ACK
 	public static final int HEADER_BACK_ACK = 150;
+	// ACK
+	public static final int HEADER_GET_VERSION = 0x16;
 	// 手环关机
 	public static final byte HEADER_CLOSE = 0x15;
 }

@@ -39,7 +39,7 @@ public class UpgradeActivity extends Activity implements OnClickListener {
     private static final int REQUEST_CODE_FILE = 2;
 
     @InjectView(R.id.btn_upgrade)
-    Button btnClose;
+    Button btn_upgrade;
     @InjectView(R.id.btn_file)
     Button btn_file;
     @InjectView(R.id.btn_refresh)
@@ -58,6 +58,8 @@ public class UpgradeActivity extends Activity implements OnClickListener {
     EditText et_filter_version;
     @InjectView(R.id.tv_file_name)
     TextView tv_file_name;
+    @InjectView(R.id.tv_version)
+    TextView tv_version;
     private DeviceAdapter mAdapter;
     private ArrayList<Device> devices;
     private BTService mBtService;
@@ -108,7 +110,7 @@ public class UpgradeActivity extends Activity implements OnClickListener {
         registerReceiver(mReceiver, filter);
         bindService(new Intent(this, BTService.class), mServiceConnection,
                 BIND_AUTO_CREATE);
-        btnClose.setEnabled(false);
+        btn_upgrade.setEnabled(false);
         etOverTime.setText(SPUtiles.getStringValue("overTime", "10"));
         etFilterName.setText(SPUtiles.getStringValue("filterName", ""));
         etScanPeriod.setText(SPUtiles.getStringValue("scanPeriod", "5"));
@@ -257,11 +259,11 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                     }
                     if (devices.isEmpty()) {
                         btnRefresh.setEnabled(true);
-                        btnClose.setEnabled(false);
+                        btn_upgrade.setEnabled(false);
                         return;
                     }
                     btnRefresh.setEnabled(true);
-                    btnClose.setEnabled(true);
+                    btn_upgrade.setEnabled(true);
                 }
                 if (BTConstants.ACTION_CONN_STATUS_TIMEOUT.equals(intent
                         .getAction())
@@ -310,26 +312,31 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                     if (ack == 0) {
                         return;
                     }
-                    if (ack == 0x22) {
-                        if (devices.isEmpty())
-                            return;
-                        Device device = devices.get(0);
-                        if (devicesMaps.containsKey(device.address)) {
-                            removeDevice();
-                            mAdapter.notifyDataSetChanged();
-                            LogModule.i("固件升级成功...");
-                            ToastUtils.showToast(UpgradeActivity.this, "固件升级成功");
-                            if (mDialog != null)
-                                mDialog.dismiss();
-                            // 关闭手环并删除
-                            // connDevice();
-                        }
+                    if(ack == BTConstants.HEADER_BACK_ACK){
+
                     }
+
+//                    if (ack == 0x96) {
+//                        if (devices.isEmpty())
+//                            return;
+//                        Device device = devices.get(0);
+//                        if (devicesMaps.containsKey(device.address)) {
+//                            removeDevice();
+//                            mAdapter.notifyDataSetChanged();
+//                            LogModule.i("固件升级成功...");
+//                            ToastUtils.showToast(UpgradeActivity.this, "固件升级成功");
+//                            if (mDialog != null)
+//                                mDialog.dismiss();
+//                            // 关闭手环并删除
+//                            // cnnDevice();
+//                        }
+//                    }
                 }
             }
 
         }
     };
+
     private ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
@@ -360,7 +367,7 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                     ToastUtils.showToast(this, "请先选择固件文件");
                     return;
                 }
-                btnClose.setEnabled(false);
+                btn_upgrade.setEnabled(false);
                 String overTime = etOverTime.getText().toString();
                 String filterName = etFilterName.getText().toString();
                 SPUtiles.setStringValue("overTime", overTime);
@@ -406,8 +413,14 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                     //得到uri，后面就是将uri转化成file的过程。
                     Uri uri = data.getData();
                     String path = FileUtils.getPath(this, uri);
-                    Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
-                    tv_file_name.setText(path);
+                    try {
+                        String[] version = FileUtils.getVersion(path);
+                        tv_version.setText(String.format("%s.%s.%s", version[0], version[1], version[2]));
+                        Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+                        tv_file_name.setText(path);
+                    } catch (Exception e) {
+                        Toast.makeText(this, "无法获取待升级固件版本号", Toast.LENGTH_SHORT).show();
+                    }
                     break;
             }
         }
