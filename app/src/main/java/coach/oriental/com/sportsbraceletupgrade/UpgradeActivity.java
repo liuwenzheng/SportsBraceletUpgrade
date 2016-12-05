@@ -273,17 +273,8 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                         .getAction())) {
                     if (devices.isEmpty())
                         return;
-                    Device device = devices.get(0);
-                    if (devicesMaps.containsKey(device.address)) {
-                        removeDevice();
-                        mAdapter.notifyDataSetChanged();
-                        LogModule.i("配对失败...");
-                        ToastUtils.showToast(UpgradeActivity.this, "配对失败");
-                        if (mDialog != null)
-                            mDialog.dismiss();
-                        // 关闭手环并删除
-                        connDevice();
-                    }
+                    isError();
+                    ToastUtils.showToast(UpgradeActivity.this, "配对失败");
                 }
                 if (BTConstants.ACTION_DISCOVER_SUCCESS.equals(intent
                         .getAction())) {
@@ -372,7 +363,7 @@ public class UpgradeActivity extends Activity implements OnClickListener {
             if (mDialog != null)
                 mDialog.dismiss();
             // 关闭手环并删除
-            // cnnDevice();
+            // connDevice();
         }
     }
 
@@ -558,7 +549,7 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                             if (mDialog != null)
                                 mDialog.dismiss();
                             // 关闭手环并删除
-                            connDevice();
+                            // connDevice();
                         }
                     }
                 });

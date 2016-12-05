@@ -3,6 +3,11 @@ package coach.oriental.com.sportsbraceletupgrade;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 public class Utils {
 
     /**
@@ -152,22 +157,33 @@ public class Utils {
         return buffer.toString();
     }
 
-    public static int CalcCrc16(byte[] pchMsg, long wDataLen) {
-        int crc = 0xffff;
-        int c;
-        for (int i = 0; i < wDataLen; i++) {
-            c = pchMsg[i] & 0x00FF;
-            crc ^= c;
-            for (int j = 0; j < 8; j++) {
-                if ((crc & 0x0001) != 0) {
-                    crc >>= 1;
-                    crc ^= 0xA001;
-                } else {
-                    crc >>= 1;
+    public static int CalcCrc16(String filePath) {
+        File file = new File(filePath);
+        try {
+            InputStream in = new FileInputStream(file);
+            byte[] pchMsg = new byte[128 * 1024];
+            long wDataLen = in.available();
+            in.read(pchMsg);
+            in.close();
+            int crc = 0xffff;
+            int c;
+            for (int i = 0; i < wDataLen; i++) {
+                c = pchMsg[i] & 0x00FF;
+                crc ^= c;
+                for (int j = 0; j < 8; j++) {
+                    if ((crc & 0x0001) != 0) {
+                        crc >>= 1;
+                        crc ^= 0xA001;
+                    } else {
+                        crc >>= 1;
+                    }
                 }
             }
+            crc = (crc >> 8) + (crc << 8);
+            return (crc);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        crc = (crc >> 8) + (crc << 8);
-        return (crc);
+        return 0;
     }
 }
