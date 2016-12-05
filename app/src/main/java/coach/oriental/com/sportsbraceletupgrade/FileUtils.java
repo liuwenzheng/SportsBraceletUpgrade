@@ -55,7 +55,7 @@ public class FileUtils {
     public static String[] getVersion(String filePath) throws Exception {
         File file = new File(filePath);
         try {
-            String fileName = file.getName().split(".")[0];
+            String fileName = file.getName().split("\\.")[0];
 
             String[] s = new String[3];
             s[0] = fileName.split("_")[1];

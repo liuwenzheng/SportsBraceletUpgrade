@@ -300,6 +300,7 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                             mDialog.dismiss();
                         device.status = Device.STATUS_UPGRADE_ING;
                         mAdapter.notifyDataSetChanged();
+                        mBtService.getVersion();
                         // 升级固件
                         // upgradeDevice(device);
                         // device.status = Device.STATUS_UPGRADE_ING;
@@ -312,7 +313,33 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                     if (ack == 0) {
                         return;
                     }
-                    if(ack == BTConstants.HEADER_BACK_ACK){
+                    if (ack == BTConstants.HEADER_BACK_ACK) {
+                        String version = SPUtiles.getStringValue(BTConstants.SP_KEY_DEVICE_VERSION, "");
+                        if (!TextUtils.isEmpty(version)) {
+                            devices.get(0).version = version;
+                            mAdapter.notifyDataSetChanged();
+                            try {
+                                boolean canUpgrade = canUpgrade(version, tv_version.getText().toString());
+                                if (canUpgrade) {
+                                    ToastUtils.showToast(UpgradeActivity.this, "可以升级");
+                                } else {
+                                    if (devices.isEmpty())
+                                        return;
+                                    isError();
+                                    ToastUtils.showToast(UpgradeActivity.this, "不允许升级");
+                                }
+                            } catch (Exception e) {
+                                if (devices.isEmpty())
+                                    return;
+                                isError();
+                                ToastUtils.showToast(UpgradeActivity.this, "比较版本失败");
+                            }
+                        } else {
+                            if (devices.isEmpty())
+                                return;
+                            isError();
+                            ToastUtils.showToast(UpgradeActivity.this, "获取手环固件版本号失败");
+                        }
 
                     }
 
@@ -336,6 +363,56 @@ public class UpgradeActivity extends Activity implements OnClickListener {
 
         }
     };
+
+    private void isError() {
+        Device device = devices.get(0);
+        if (devicesMaps.containsKey(device.address)) {
+            removeDevice();
+            mAdapter.notifyDataSetChanged();
+            if (mDialog != null)
+                mDialog.dismiss();
+            // 关闭手环并删除
+            // cnnDevice();
+        }
+    }
+
+    private boolean canUpgrade(String srcVersion, String targetVersion) throws Exception {
+        try {
+            String[] src = srcVersion.split("\\.");
+            String[] target = targetVersion.split("\\.");
+            for (int i = 0; i < src.length; i++) {
+                int src1 = Integer.parseInt(src[0], 16);
+                int target1 = Integer.parseInt(target[0], 16);
+                if (target1 > src1) {
+                    return true;
+                } else if (target1 < src1) {
+                    return false;
+                } else {
+                    int src2 = Integer.parseInt(src[1], 16);
+                    int target2 = Integer.parseInt(target[1], 16);
+                    if (target2 > src2) {
+                        return true;
+                    } else if (target2 < src2) {
+                        return false;
+                    } else {
+                        int src3 = Integer.parseInt(src[2], 16);
+                        int target3 = Integer.parseInt(target[2], 16);
+                        if (target3 > src3) {
+                            return true;
+                        } else if (target3 < src3) {
+                            return false;
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return false;
+    }
+
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
 

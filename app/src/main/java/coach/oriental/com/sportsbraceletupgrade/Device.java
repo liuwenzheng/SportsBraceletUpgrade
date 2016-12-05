@@ -16,11 +16,16 @@ public class Device implements Parcelable, Comparable<Device> {
      * 正在升级
      */
     public static final int STATUS_UPGRADE_ING = 2;
+    /**
+     * 获取版本号
+     */
+    public static final int STATUS_GET_VERSION = 3;
     public String name;
     public String address;
     public int rssi;
     public int status;
     public byte[] scanRecord;
+    public String version;
 
 
     @Override
@@ -46,6 +51,7 @@ public class Device implements Parcelable, Comparable<Device> {
         dest.writeInt(this.rssi);
         dest.writeInt(this.status);
         dest.writeByteArray(this.scanRecord);
+        dest.writeString(this.version);
     }
 
     public Device() {
@@ -57,6 +63,7 @@ public class Device implements Parcelable, Comparable<Device> {
         this.rssi = in.readInt();
         this.status = in.readInt();
         this.scanRecord = in.createByteArray();
+        this.version = in.readString();
     }
 
     public static final Creator<Device> CREATOR = new Creator<Device>() {

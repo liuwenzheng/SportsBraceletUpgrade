@@ -174,14 +174,11 @@ public class BTService extends Service implements LeScanCallback {
                     String[] formatDatas = Utils.formatData(data, characteristic);
                     int header = Integer.valueOf(Utils.decodeToString(formatDatas[0]));
                     if (header == BTConstants.HEADER_BACK_ACK) {
-                        int ack = Integer.valueOf(Utils.decodeToString(formatDatas[1]));
+                        // int ack = Integer.valueOf(Utils.decodeToString(formatDatas[1]));
                         SPUtiles.setStringValue(BTConstants.SP_KEY_DEVICE_VERSION,
-                                String.format("%s.%s.%s",
-                                        Utils.decodeToString(formatDatas[2]),
-                                        Utils.decodeToString(formatDatas[3]),
-                                        Utils.decodeToString(formatDatas[4])));
+                                String.format("%s.%s.%s", formatDatas[1], formatDatas[2], formatDatas[3]));
                         Intent intent = new Intent(BTConstants.ACTION_ACK);
-                        intent.putExtra(BTConstants.EXTRA_KEY_ACK_VALUE, ack);
+                        intent.putExtra(BTConstants.EXTRA_KEY_ACK_VALUE, header);
                         BTService.this.sendBroadcast(intent);
                         return;
                     }
