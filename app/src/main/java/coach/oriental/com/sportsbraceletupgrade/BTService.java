@@ -174,13 +174,36 @@ public class BTService extends Service implements LeScanCallback {
                     String[] formatDatas = Utils.formatData(data, characteristic);
                     int header = Integer.valueOf(Utils.decodeToString(formatDatas[0]));
                     if (header == BTConstants.HEADER_BACK_ACK) {
-                        // int ack = Integer.valueOf(Utils.decodeToString(formatDatas[1]));
-                        SPUtiles.setStringValue(BTConstants.SP_KEY_DEVICE_VERSION,
-                                String.format("%s.%s.%s", formatDatas[1], formatDatas[2], formatDatas[3]));
+                        Intent intent = new Intent(BTConstants.ACTION_ACK);
+                        int ack = Integer.valueOf(Utils.decodeToString(formatDatas[1]));
+                        switch (ack) {
+                            case BTConstants.HEADER_CRC:
+                                intent.putExtra(BTConstants.EXTRA_KEY_ACK_VALUE, ack);
+                                BTService.this.sendBroadcast(intent);
+                                break;
+                            default:
+                                // 没有对应ack就是固件版本
+                                SPUtiles.setStringValue(BTConstants.SP_KEY_DEVICE_VERSION,
+                                        String.format("%s.%s.%s", formatDatas[1], formatDatas[2], formatDatas[3]));
+                                intent.putExtra(BTConstants.EXTRA_KEY_ACK_VALUE, header);
+                                BTService.this.sendBroadcast(intent);
+                                break;
+                        }
+                    }
+                    if (header == BTConstants.HEADER_BACK_PACKAGE) {
+                        Intent intent = new Intent(BTConstants.ACTION_ACK);
+                        byte[] index = new byte[2];
+                        index[0] = data[1];
+                        index[1] = data[2];
+                        intent.putExtra(BTConstants.EXTRA_KEY_ACK_VALUE, header);
+                        intent.putExtra(BTConstants.EXTRA_KEY_PACKAGE_INDEX, index);
+                        BTService.this.sendBroadcast(intent);
+                    }
+                    if (header == BTConstants.HEADER_BACK_PACKAGE_RESULT) {
                         Intent intent = new Intent(BTConstants.ACTION_ACK);
                         intent.putExtra(BTConstants.EXTRA_KEY_ACK_VALUE, header);
+                        intent.putExtra(BTConstants.EXTRA_KEY_PACKAGE_RESULT, Integer.valueOf(Utils.decodeToString(formatDatas[1])));
                         BTService.this.sendBroadcast(intent);
-                        return;
                     }
                 }
             };
@@ -240,6 +263,20 @@ public class BTService extends Service implements LeScanCallback {
      */
     public void getVersion() {
         BTModule.getVersion(mBluetoothGatt);
+    }
+
+    /**
+     * CRC
+     */
+    public void getCRCResult(String filePath) throws Exception {
+        BTModule.getCRCResult(mBluetoothGatt, filePath);
+    }
+
+    /**
+     * PACKAGE
+     */
+    public void sendPackage(byte[] packageIndex, String filePath) throws Exception {
+        BTModule.sendPackage(mBluetoothGatt, packageIndex, filePath);
     }
 
     /**

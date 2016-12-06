@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.content.Intent;
 
+import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
@@ -87,6 +88,45 @@ public class BTModule {
 
     /**
      * 获取内部版本号
+     *
+     * @param mBluetoothGatt
+     */
+    public static void getCRCResult(BluetoothGatt mBluetoothGatt, String filePath) throws Exception {
+        byte[] byteArray = new byte[7];
+        byteArray[0] = BTConstants.HEADER_CRC;
+        // crc
+        byte[] crc = Utils.toByteArray(Utils.CalcCrc16(filePath), 2);
+        byteArray[1] = crc[0];
+        byteArray[2] = crc[1];
+        // length
+        byte[] fileLength = Utils.toByteArray((int) new File(filePath).length(), 4);
+        byteArray[3] = fileLength[0];
+        byteArray[4] = fileLength[1];
+        byteArray[5] = fileLength[2];
+        byteArray[6] = fileLength[3];
+
+        writeCharacteristicData(mBluetoothGatt, byteArray);
+    }
+
+    /**
+     * 获取内部版本号
+     *
+     * @param mBluetoothGatt
+     */
+    public static void sendPackage(BluetoothGatt mBluetoothGatt, byte[] packageIndex, String filePath) throws Exception {
+        byte[] byteArray = new byte[20];
+        byteArray[0] = BTConstants.HEADER_PACKAGE;
+        byteArray[1] = packageIndex[0];
+        byteArray[2] = packageIndex[1];
+        byte[] file = FileUtils.readFile(filePath);
+        for (int i = 0; i < file.length; i++) {
+            byteArray[3 + i] = file[i];
+        }
+        writeCharacteristicData(mBluetoothGatt, byteArray);
+    }
+
+    /**
+     * CRC校验
      *
      * @param mBluetoothGatt
      */

@@ -5,7 +5,6 @@ import android.content.Context;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 public class Utils {
@@ -157,33 +156,53 @@ public class Utils {
         return buffer.toString();
     }
 
-    public static int CalcCrc16(String filePath) {
+    public static int CalcCrc16(String filePath) throws Exception {
         File file = new File(filePath);
-        try {
-            InputStream in = new FileInputStream(file);
-            byte[] pchMsg = new byte[128 * 1024];
-            long wDataLen = in.available();
-            in.read(pchMsg);
-            in.close();
-            int crc = 0xffff;
-            int c;
-            for (int i = 0; i < wDataLen; i++) {
-                c = pchMsg[i] & 0x00FF;
-                crc ^= c;
-                for (int j = 0; j < 8; j++) {
-                    if ((crc & 0x0001) != 0) {
-                        crc >>= 1;
-                        crc ^= 0xA001;
-                    } else {
-                        crc >>= 1;
-                    }
+        InputStream in = new FileInputStream(file);
+        byte[] pchMsg = new byte[128 * 1024];
+        int wDataLen = in.available();
+        in.read(pchMsg);
+        int crc = 0xffff;
+        int c;
+        for (int i = 0; i < wDataLen; i++) {
+            c = pchMsg[i] & 0x00FF;
+            crc ^= c;
+            for (int j = 0; j < 8; j++) {
+                if ((crc & 0x0001) != 0) {
+                    crc >>= 1;
+                    crc ^= 0xA001;
+                } else {
+                    crc >>= 1;
                 }
             }
-            crc = (crc >> 8) + (crc << 8);
-            return (crc);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return 0;
+        crc = (crc >> 8) + (crc << 8);
+        in.close();
+        return (crc);
+    }
+
+    public static byte[] toByteArray(int iSource, int iArrayLen) {
+        byte[] bLocalArr = new byte[iArrayLen];
+        for (int i = 0; (i < 4) && (i < iArrayLen); i++) {
+            bLocalArr[i] = (byte) (iSource >> 8 * i & 0xFF);
+        }
+        // 数据反了,需要做个翻转
+        byte[] bytes = new byte[iArrayLen];
+        for (int i = 0; i < bLocalArr.length; i++) {
+            bytes[bLocalArr.length - 1 - i] = bLocalArr[i];
+        }
+        return bytes;
+    }
+
+    // 将byte数组bRefArr转为一个整数,字节数组的低位是整型的低字节位
+    public static int toInt(byte[] bRefArr) {
+        int iOutcome = 0;
+        byte bLoop;
+
+        for (int i = 0; i < bRefArr.length; i++) {
+            bLoop = bRefArr[i];
+            iOutcome += (bLoop & 0xFF) << (8 * i);
+        }
+        return iOutcome;
     }
 }

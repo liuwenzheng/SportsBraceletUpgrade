@@ -52,6 +52,8 @@ public class DeviceAdapter extends BaseAdapter {
                     .findViewById(R.id.tv_device_status);
             holder.tv_device_rssi = (TextView) convertView
                     .findViewById(R.id.tv_device_rssi);
+            holder.tv_device_version = (TextView) convertView
+                    .findViewById(R.id.tv_device_version);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -67,12 +69,14 @@ public class DeviceAdapter extends BaseAdapter {
             holder.tv_device_status.setText("正在获取版本号");
         }
         holder.tv_device_rssi.setText(device.rssi + "");
+        holder.tv_device_version.setText(device.version);
         return convertView;
     }
 
     class ViewHolder {
         TextView tv_device_name;
         TextView tv_device_status;
+        TextView tv_device_version;
         TextView tv_device_rssi;
     }
 }

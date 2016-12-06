@@ -37,6 +37,8 @@ public class BTConstants {
 	 */
 	// 设备列表
 	public static final String EXTRA_KEY_ACK_VALUE = "extra_key_ack_value";
+	public static final String EXTRA_KEY_PACKAGE_INDEX = "extra_key_package_index";
+	public static final String EXTRA_KEY_PACKAGE_RESULT = "extra_key_package_result";
 
 	/**
 	 * 返回数据header
@@ -47,4 +49,12 @@ public class BTConstants {
 	public static final int HEADER_GET_VERSION = 0x16;
 	// 手环关机
 	public static final byte HEADER_CLOSE = 0x15;
+	// ACK
+	public static final byte HEADER_CRC = 0x28;
+	// ACK
+	public static final byte HEADER_PACKAGE = 0x29;
+	// ACK
+	public static final int HEADER_BACK_PACKAGE = 166;
+	// RESULT
+	public static final int HEADER_BACK_PACKAGE_RESULT = 167;
 }
