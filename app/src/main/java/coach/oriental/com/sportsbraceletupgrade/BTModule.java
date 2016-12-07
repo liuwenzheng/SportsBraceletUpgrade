@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import java.io.File;
 import java.util.List;
@@ -212,17 +213,18 @@ public class BTModule {
         }
         BluetoothGattService service = mBluetoothGatt.getService(SERVIE_UUID);
 
-        LogModule.i("writeCharacteristicData...service:" + service);
+        // LogModule.i("writeCharacteristicData...service:" + service);
         if (service == null) {
             return;
         }
         BluetoothGattCharacteristic characteristic = null;
         characteristic = service.getCharacteristic(CHARACTERISTIC_UUID_WRITE);
-        LogModule.i("writeCharacteristicData...characteristic:"
-                + characteristic);
+        // LogModule.i("writeCharacteristicData...characteristic:" + characteristic);
         if (characteristic == null) {
             return;
         }
+        LogModule.i("发送数据：");
+        Utils.formatData(byteArray, null);
         characteristic.setValue(byteArray);
         characteristic
                 .setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);

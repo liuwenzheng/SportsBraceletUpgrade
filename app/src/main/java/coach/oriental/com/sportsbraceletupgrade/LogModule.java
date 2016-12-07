@@ -1,13 +1,14 @@
 package coach.oriental.com.sportsbraceletupgrade;
 
 import android.text.TextUtils;
-import android.util.Log;
+
+import com.elvishew.xlog.XLog;
 
 /**
  * Log组件
- * 
+ *
  * @author wenzheng.liu
- * 
+ *
  */
 public class LogModule {
 	// tag
@@ -30,10 +31,10 @@ public class LogModule {
 		}
 		if (TextUtils.isEmpty(tag)) {
 			tag = TAG;
-			Log.v(tag, msg, thr);
+			XLog.v(tag, msg, thr);
 		} else {
-			Log.v(TAG, msg, thr);
-			Log.v(tag, msg, thr);
+			XLog.v(TAG, msg, thr);
+			XLog.v(tag, msg, thr);
 		}
 	}
 
@@ -52,10 +53,10 @@ public class LogModule {
 		}
 		if (TextUtils.isEmpty(tag)) {
 			tag = TAG;
-			Log.i(tag, msg, thr);
+			XLog.i(msg);
 		} else {
-			Log.i(TAG, msg, thr);
-			Log.i(tag, msg, thr);
+			XLog.i(TAG, msg, thr);
+			XLog.i(tag, msg, thr);
 		}
 
 	}
@@ -75,10 +76,10 @@ public class LogModule {
 		}
 		if (TextUtils.isEmpty(tag)) {
 			tag = TAG;
-			Log.d(tag, msg, thr);
+			XLog.d(msg);
 		} else {
-			Log.d(TAG, msg, thr);
-			Log.d(tag, msg, thr);
+			XLog.d(TAG, msg, thr);
+			XLog.d(tag, msg, thr);
 		}
 
 	}
@@ -98,10 +99,10 @@ public class LogModule {
 		}
 		if (TextUtils.isEmpty(tag)) {
 			tag = TAG;
-			Log.w(tag, msg, thr);
+			XLog.w(tag, msg, thr);
 		} else {
-			Log.w(TAG, msg, thr);
-			Log.w(tag, msg, thr);
+			XLog.w(TAG, msg, thr);
+			XLog.w(tag, msg, thr);
 		}
 	}
 
@@ -120,10 +121,10 @@ public class LogModule {
 		}
 		if (TextUtils.isEmpty(tag)) {
 			tag = TAG;
-			Log.e(tag, msg, thr);
+			XLog.e(tag, msg, thr);
 		} else {
-			Log.e(TAG, msg, thr);
-			Log.e(tag, msg, thr);
+			XLog.e(TAG, msg, thr);
+			XLog.e(tag, msg, thr);
 		}
 	}
 

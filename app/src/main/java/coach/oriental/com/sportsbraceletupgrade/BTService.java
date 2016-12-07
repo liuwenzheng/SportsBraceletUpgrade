@@ -171,6 +171,7 @@ public class BTService extends Service implements LeScanCallback {
                     super.onCharacteristicChanged(gatt, characteristic);
                     LogModule.d("onCharacteristicChanged...");
                     byte[] data = characteristic.getValue();
+                    LogModule.i("接收数据：");
                     String[] formatDatas = Utils.formatData(data, characteristic);
                     int header = Integer.valueOf(Utils.decodeToString(formatDatas[0]));
                     if (header == BTConstants.HEADER_BACK_ACK) {

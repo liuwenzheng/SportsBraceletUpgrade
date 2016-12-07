@@ -314,7 +314,12 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                             ToastUtils.showToast(UpgradeActivity.this, "接收到的序号：" + Utils.toInt(index));
                         } catch (Exception e) {
                             e.printStackTrace();
+                            if (mDialog != null)
+                                mDialog.dismiss();
                             ToastUtils.showToast(UpgradeActivity.this, "发送包异常");
+                            if (devices.isEmpty())
+                                return;
+                            isError();
                         }
                         return;
                     }
