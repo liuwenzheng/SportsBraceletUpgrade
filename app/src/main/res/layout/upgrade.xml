@@ -188,7 +188,7 @@
                 android:layout_weight="1.0"
                 android:digits="-0123456789"
                 android:inputType="number"
-                android:text="-100" />
+                android:text="-96" />
         </LinearLayout>
 
         <LinearLayout

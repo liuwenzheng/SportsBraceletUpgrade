@@ -78,7 +78,8 @@ public class UpgradeActivity extends Activity implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{
                                 Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE}
                         , PERMISSION_REQUEST_CODE);
@@ -119,7 +120,7 @@ public class UpgradeActivity extends Activity implements OnClickListener {
         etOverTime.setText(SPUtiles.getStringValue("overTime", "10"));
         etFilterName.setText(SPUtiles.getStringValue("filterName", ""));
         etScanPeriod.setText(SPUtiles.getStringValue("scanPeriod", "5"));
-        etFilterRssi.setText(SPUtiles.getStringValue("filterRssi", "-100"));
+        etFilterRssi.setText(SPUtiles.getStringValue("filterRssi", "-96"));
         et_filter_version.setText(SPUtiles.getStringValue("filterVersion", ""));
     }
 
@@ -186,7 +187,8 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                             && !bleDevice.name.equals(filterName)) {
                         return;
                     }
-                    if (Integer.valueOf(bleDevice.rssi) <= mFilterRssi) {
+                    int rssi = Integer.valueOf(bleDevice.rssi);
+                    if (rssi <= mFilterRssi || rssi > 4) {
                         return;
                     }
                     if (!TextUtils.isEmpty(et_filter_version.getText().toString())) {
@@ -564,7 +566,7 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                 SPUtiles.setStringValue("filterRssi", filterRssi);
                 String filterVersion = et_filter_version.getText().toString();
                 SPUtiles.setStringValue("filterVersion", filterVersion);
-                mFilterRssi = TextUtils.isEmpty(filterRssi) ? -1000 : Integer.parseInt(filterRssi);
+                mFilterRssi = TextUtils.isEmpty(filterRssi) ? -96 : Integer.parseInt(filterRssi);
                 break;
             case R.id.btn_file:
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
