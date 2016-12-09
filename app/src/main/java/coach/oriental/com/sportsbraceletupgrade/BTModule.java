@@ -114,12 +114,12 @@ public class BTModule {
      *
      * @param mBluetoothGatt
      */
-    public static void sendPackage(BluetoothGatt mBluetoothGatt, byte[] packageIndex, String filePath) throws Exception {
+    public static void sendPackage(BluetoothGatt mBluetoothGatt, byte[] packageIndex, byte[] fileBytes) throws Exception {
         byte[] byteArray = new byte[20];
         byteArray[0] = BTConstants.HEADER_PACKAGE;
         byteArray[1] = packageIndex[0];
         byteArray[2] = packageIndex[1];
-        byte[] file = FileUtils.readFile(filePath);
+        byte[] file = fileBytes;
         for (int i = 0; i < file.length; i++) {
             byteArray[3 + i] = file[i];
         }

@@ -26,6 +26,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,6 +72,7 @@ public class UpgradeActivity extends Activity implements OnClickListener {
     private long mOverTime;
     private int mFilterRssi;
     private String mConnDeviceAddress;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,6 +147,14 @@ public class UpgradeActivity extends Activity implements OnClickListener {
         mBtService.disConnectBle();
         unbindService(mServiceConnection);
         mBtService = null;
+        if (in != null) {
+            try {
+                in.close();
+                in = null;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         // stopService(new Intent(this, BTService.class));
         super.onDestroy();
     }
@@ -159,6 +172,7 @@ public class UpgradeActivity extends Activity implements OnClickListener {
         }, 200);
     }
 
+    private InputStream in;
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
         @Override
@@ -271,6 +285,14 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                         .equals(intent.getAction())
                         || BTConstants.ACTION_DISCOVER_FAILURE.equals(intent
                         .getAction())) {
+                    if (in != null) {
+                        try {
+                            in.close();
+                            in = null;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     if (mDialog != null)
                         mDialog.dismiss();
                     if (devices.isEmpty())
@@ -308,18 +330,44 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                         return;
                     }
                     if (ack == BTConstants.HEADER_BACK_PACKAGE) {
-                        byte[] index = intent.getByteArrayExtra(BTConstants.EXTRA_KEY_PACKAGE_INDEX);
-                        try {
-                            mBtService.sendPackage(index, tv_file_name.getText().toString());
-                            ToastUtils.showToast(UpgradeActivity.this, "接收到的序号：" + Utils.toInt(index));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            if (mDialog != null)
-                                mDialog.dismiss();
-                            ToastUtils.showToast(UpgradeActivity.this, "发送包异常");
-                            if (devices.isEmpty())
-                                return;
-                            isError();
+                        final byte[] index = intent.getByteArrayExtra(BTConstants.EXTRA_KEY_PACKAGE_INDEX);
+                        if (Utils.toInt(index) == 0) {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    int i = 0;
+                                    try {
+                                        File file = new File(tv_file_name.getText().toString());
+                                        if (in == null) {
+                                            in = new FileInputStream(file);
+                                        }
+                                        while (in.available() > 0) {
+                                            byte[] indexByte = Utils.toByteArray(i, 2);
+                                            byte b[] = new byte[17];
+                                            in.read(b);
+                                            mBtService.sendPackage(indexByte, b);
+                                            i++;
+                                            Thread.sleep(20);
+                                        }
+                                        in.close();
+                                        in = null;
+                                    } catch (Exception e) {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (mDialog != null)
+                                                    mDialog.dismiss();
+                                                ToastUtils.showToast(UpgradeActivity.this, "发送包异常");
+                                                if (devices.isEmpty())
+                                                    return;
+                                                isError();
+                                            }
+                                        });
+                                    }
+                                }
+                            }).start();
+//                                ToastUtils.showToast(UpgradeActivity.this, "接收到的序号：" + Utils.toInt(index));
+                            ToastUtils.showToast(UpgradeActivity.this, "开始发送数据包");
                         }
                         return;
                     }

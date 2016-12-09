@@ -276,8 +276,8 @@ public class BTService extends Service implements LeScanCallback {
     /**
      * PACKAGE
      */
-    public void sendPackage(byte[] packageIndex, String filePath) throws Exception {
-        BTModule.sendPackage(mBluetoothGatt, packageIndex, filePath);
+    public void sendPackage(byte[] packageIndex, byte[] fileBytes) throws Exception {
+        BTModule.sendPackage(mBluetoothGatt, packageIndex, fileBytes);
     }
 
     /**
