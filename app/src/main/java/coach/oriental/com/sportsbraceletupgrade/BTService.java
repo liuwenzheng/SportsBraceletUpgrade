@@ -182,10 +182,9 @@ public class BTService extends Service implements LeScanCallback {
                                 intent.putExtra(BTConstants.EXTRA_KEY_ACK_VALUE, ack);
                                 BTService.this.sendBroadcast(intent);
                                 break;
-                            default:
-                                // 没有对应ack就是固件版本
+                            case BTConstants.HEADER_VERSION:
                                 SPUtiles.setStringValue(BTConstants.SP_KEY_DEVICE_VERSION,
-                                        String.format("%s.%s.%s", formatDatas[1], formatDatas[2], formatDatas[3]));
+                                        String.format("%s.%s.%s", formatDatas[2], formatDatas[3], formatDatas[4]));
                                 intent.putExtra(BTConstants.EXTRA_KEY_ACK_VALUE, header);
                                 BTService.this.sendBroadcast(intent);
                                 break;

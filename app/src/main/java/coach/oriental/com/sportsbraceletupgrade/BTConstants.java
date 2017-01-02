@@ -52,6 +52,8 @@ public class BTConstants {
 	// ACK
 	public static final byte HEADER_CRC = 0x28;
 	// ACK
+	public static final byte HEADER_VERSION = 0x09;
+	// ACK
 	public static final byte HEADER_PACKAGE = 0x29;
 	// ACK
 	public static final int HEADER_BACK_PACKAGE = 166;
