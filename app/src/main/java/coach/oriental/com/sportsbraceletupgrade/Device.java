@@ -20,6 +20,10 @@ public class Device implements Parcelable, Comparable<Device> {
      * 获取版本号
      */
     public static final int STATUS_GET_VERSION = 3;
+    /**
+     * 升级成功
+     */
+    public static final int STATUS_UPGRADE_SUCCESS = 4;
     public String name;
     public String address;
     public int rssi;

@@ -20,6 +20,7 @@ import android.os.IBinder;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -38,7 +39,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class UpgradeActivity extends Activity implements OnClickListener {
+public class UpgradeActivity extends Activity implements OnClickListener, AdapterView.OnItemClickListener {
     private static final int PERMISSION_REQUEST_CODE = 1;
     private static final int REQUEST_CODE_FILE = 2;
 
@@ -58,8 +59,8 @@ public class UpgradeActivity extends Activity implements OnClickListener {
     EditText etOverTime;
     @InjectView(R.id.et_filter_rssi)
     EditText etFilterRssi;
-    @InjectView(R.id.et_filter_version)
-    EditText et_filter_version;
+    //    @InjectView(R.id.et_filter_version)
+//    EditText et_filter_version;
     @InjectView(R.id.tv_file_name)
     TextView tv_file_name;
     @InjectView(R.id.tv_version)
@@ -71,7 +72,7 @@ public class UpgradeActivity extends Activity implements OnClickListener {
     private HashMap<String, Device> devicesMaps;
     private long mOverTime;
     private int mFilterRssi;
-    private String mConnDeviceAddress;
+    private Device mDevice;
 
 
     @Override
@@ -103,6 +104,7 @@ public class UpgradeActivity extends Activity implements OnClickListener {
         devicesMaps = new HashMap<>();
         mAdapter = new DeviceAdapter(this, devices);
         lvDevices.setAdapter(mAdapter);
+        lvDevices.setOnItemClickListener(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BTConstants.ACTION_BLE_DEVICES_DATA);
@@ -121,7 +123,7 @@ public class UpgradeActivity extends Activity implements OnClickListener {
         etFilterName.setText(SPUtiles.getStringValue("filterName", ""));
         etScanPeriod.setText(SPUtiles.getStringValue("scanPeriod", "5"));
         etFilterRssi.setText(SPUtiles.getStringValue("filterRssi", "-96"));
-        et_filter_version.setText(SPUtiles.getStringValue("filterVersion", ""));
+//        et_filter_version.setText(SPUtiles.getStringValue("filterVersion", ""));
     }
 
     @Override
@@ -163,15 +165,15 @@ public class UpgradeActivity extends Activity implements OnClickListener {
     /**
      * 同步数据
      */
-    private void synData() {
-        // 5.0偶尔会出现获取不到数据的情况，这时候延迟发送命令，解决问题
-        BTService.mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mBtService.synSleep();
-            }
-        }, 200);
-    }
+//    private void synData() {
+//        // 5.0偶尔会出现获取不到数据的情况，这时候延迟发送命令，解决问题
+//        BTService.mHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mBtService.synSleep();
+//            }
+//        }, 200);
+//    }
 
     private InputStream in;
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -191,81 +193,81 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                     if (rssi <= mFilterRssi || rssi > 4) {
                         return;
                     }
-                    if (!TextUtils.isEmpty(et_filter_version.getText().toString())) {
-                        byte[] scanRecord = bleDevice.scanRecord;
-                        StringBuilder sb = new StringBuilder();
-                        for (int i = 0; i < scanRecord.length; i++) {
-                            sb.append(Utils.byte2HexString(scanRecord[i]));
-                            if (i < scanRecord.length - 1) {
-                                sb.append(" ");
-                            }
-                            if (i % 15 == 1)
-                                sb.append("\n");
-                        }
-                        LogModule.i(sb.toString());
-                        int index = 0;
-                        for (int i = 0; i < scanRecord.length; i++) {
-                            if ("0a".equals(Utils.byte2HexString(scanRecord[i]))
-                                    && "ff".equals(Utils.byte2HexString(scanRecord[i + 1]))) {
-                                index = i + 8;
-                                break;
-                            }
-                        }
-                        if (index == 0) {
-                            return;
-                        }
-                        LogModule.i(index + "");
-                        LogModule.i("手环固件版本号：" + Utils.byte2HexString(scanRecord[index])
-                                + Utils.byte2HexString(scanRecord[index + 1])
-                                + Utils.byte2HexString(scanRecord[index + 2]));
-                        LogModule.i(et_filter_version.getText().toString() + "");
-                        String[] s = et_filter_version.getText().toString().split("\\.");
-                        if (s.length != 3) {
-                            return;
-                        }
-                        String s1 = Utils.decodeToHex(s[0]);
-                        String s2 = Utils.decodeToHex(s[1]);
-                        String s3 = Utils.decodeToHex(s[2]);
-                        if (s1.length() == 1) {
-                            s1 = "0" + s1;
-                        }
-                        if (s2.length() == 1) {
-                            s2 = "0" + s2;
-                        }
-                        if (s3.length() == 1) {
-                            s3 = "0" + s3;
-                        }
-                        LogModule.i("filter version : " + s1 + "." + s2 + "." + s3);
-                        if (s1.equals(Utils.byte2HexString(scanRecord[index]))
-                                && s2.equals(Utils.byte2HexString(scanRecord[index + 1]))
-                                && s3.equals(Utils.byte2HexString(scanRecord[index + 2]))) {
-                            if (!devicesMaps.containsKey(bleDevice.address)) {
-                                devicesMaps.put(bleDevice.address, bleDevice);
-                                devices.add(bleDevice);
-                            } else {
-                                return;
-                            }
-                            Collections.sort(devices);
-                            mAdapter.setDevices(devices);
-                            mAdapter.notifyDataSetChanged();
-                            if (devices.size() >= 30) {
-                                mBtService.stopLeScan();
-                            }
-                        }
+//                    if (!TextUtils.isEmpty(et_filter_version.getText().toString())) {
+//                        byte[] scanRecord = bleDevice.scanRecord;
+//                        StringBuilder sb = new StringBuilder();
+//                        for (int i = 0; i < scanRecord.length; i++) {
+//                            sb.append(Utils.byte2HexString(scanRecord[i]));
+//                            if (i < scanRecord.length - 1) {
+//                                sb.append(" ");
+//                            }
+//                            if (i % 15 == 1)
+//                                sb.append("\n");
+//                        }
+//                        LogModule.i(sb.toString());
+//                        int index = 0;
+//                        for (int i = 0; i < scanRecord.length; i++) {
+//                            if ("0a".equals(Utils.byte2HexString(scanRecord[i]))
+//                                    && "ff".equals(Utils.byte2HexString(scanRecord[i + 1]))) {
+//                                index = i + 8;
+//                                break;
+//                            }
+//                        }
+//                        if (index == 0) {
+//                            return;
+//                        }
+//                        LogModule.i(index + "");
+//                        LogModule.i("手环固件版本号：" + Utils.byte2HexString(scanRecord[index])
+//                                + Utils.byte2HexString(scanRecord[index + 1])
+//                                + Utils.byte2HexString(scanRecord[index + 2]));
+//                        LogModule.i(et_filter_version.getText().toString() + "");
+//                        String[] s = et_filter_version.getText().toString().split("\\.");
+//                        if (s.length != 3) {
+//                            return;
+//                        }
+//                        String s1 = Utils.decodeToHex(s[0]);
+//                        String s2 = Utils.decodeToHex(s[1]);
+//                        String s3 = Utils.decodeToHex(s[2]);
+//                        if (s1.length() == 1) {
+//                            s1 = "0" + s1;
+//                        }
+//                        if (s2.length() == 1) {
+//                            s2 = "0" + s2;
+//                        }
+//                        if (s3.length() == 1) {
+//                            s3 = "0" + s3;
+//                        }
+//                        LogModule.i("filter version : " + s1 + "." + s2 + "." + s3);
+//                        if (s1.equals(Utils.byte2HexString(scanRecord[index]))
+//                                && s2.equals(Utils.byte2HexString(scanRecord[index + 1]))
+//                                && s3.equals(Utils.byte2HexString(scanRecord[index + 2]))) {
+//                            if (!devicesMaps.containsKey(bleDevice.address)) {
+//                                devicesMaps.put(bleDevice.address, bleDevice);
+//                                devices.add(bleDevice);
+//                            } else {
+//                                return;
+//                            }
+//                            Collections.sort(devices);
+//                            mAdapter.setDevices(devices);
+//                            mAdapter.notifyDataSetChanged();
+//                            if (devices.size() >= 30) {
+//                                mBtService.stopLeScan();
+//                            }
+//                        }
+//                    } else {
+                    if (!devicesMaps.containsKey(bleDevice.address)) {
+                        devicesMaps.put(bleDevice.address, bleDevice);
+                        devices.add(bleDevice);
                     } else {
-                        if (!devicesMaps.containsKey(bleDevice.address)) {
-                            devicesMaps.put(bleDevice.address, bleDevice);
-                            devices.add(bleDevice);
-                        } else {
-                            return;
-                        }
-                        Collections.sort(devices);
-                        mAdapter.setDevices(devices);
-                        mAdapter.notifyDataSetChanged();
-                        if (devices.size() >= 30) {
-                            mBtService.stopLeScan();
-                        }
+                        return;
                     }
+                    Collections.sort(devices);
+                    mAdapter.setDevices(devices);
+                    mAdapter.notifyDataSetChanged();
+                    if (devices.size() >= 30) {
+                        mBtService.stopLeScan();
+                    }
+//                    }
                 }
                 if (BTConstants.ACTION_BLE_DEVICES_DATA_END.equals(intent
                         .getAction())) {
@@ -297,26 +299,26 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                     }
                     if (mDialog != null)
                         mDialog.dismiss();
-                    if (devices.isEmpty())
-                        return;
-                    isError();
+//                    if (devices.isEmpty())
+//                        return;
+//                    isError();
+                    mDevice.status = Device.STATUS_CONN_FALSE;
+                    mAdapter.notifyDataSetChanged();
                     ToastUtils.showToast(UpgradeActivity.this, "配对失败");
                 }
                 if (BTConstants.ACTION_DISCOVER_SUCCESS.equals(intent
                         .getAction())) {
-                    if (devices.isEmpty())
-                        return;
-                    Device device = devices.get(0);
-                    if (devicesMaps.containsKey(device.address)) {
+//                    if (devices.isEmpty())
+//                        return;
+                    if (devicesMaps.containsKey(mDevice.address)) {
                         mAdapter.notifyDataSetChanged();
                         // 连接超时
                         LogModule.i("配对成功...");
                         ToastUtils.showToast(UpgradeActivity.this, "配对成功");
-                        mConnDeviceAddress = device.address;
                         if (mDialog != null)
                             mDialog.dismiss();
                         mDialog = ProgressDialog.show(UpgradeActivity.this, null, "获取版本号", false, false);
-                        device.status = Device.STATUS_GET_VERSION;
+                        mDevice.status = Device.STATUS_GET_VERSION;
                         mAdapter.notifyDataSetChanged();
                         mBtService.getVersion();
                         // 升级固件
@@ -357,12 +359,14 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
+                                                mDevice.status = Device.STATUS_CONN_FALSE;
+                                                mAdapter.notifyDataSetChanged();
                                                 if (mDialog != null)
                                                     mDialog.dismiss();
                                                 ToastUtils.showToast(UpgradeActivity.this, "发送包异常");
-                                                if (devices.isEmpty())
-                                                    return;
-                                                isError();
+//                                                if (devices.isEmpty())
+//                                                    return;
+//                                                isError();
                                             }
                                         });
                                     }
@@ -394,9 +398,16 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                                 ToastUtils.showToast(UpgradeActivity.this, "未知错误");
                                 break;
                         }
-                        if (devices.isEmpty())
-                            return;
-                        isError();
+                        if (result != 0) {
+                            mDevice.status = Device.STATUS_CONN_FALSE;
+                            mAdapter.notifyDataSetChanged();
+                        } else {
+                            mDevice.status = Device.STATUS_UPGRADE_SUCCESS;
+                            mAdapter.notifyDataSetChanged();
+                        }
+//                        if (devices.isEmpty())
+//                            return;
+//                        isError();
                         return;
                     }
                     if (ack == BTConstants.HEADER_CRC) {
@@ -411,8 +422,8 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                             mDialog.dismiss();
                         String version = SPUtiles.getStringValue(BTConstants.SP_KEY_DEVICE_VERSION, "");
                         if (!TextUtils.isEmpty(version)) {
-                            devices.get(0).version = version;
-                            devices.get(0).status = Device.STATUS_UPGRADE_ING;
+                            mDevice.version = version;
+                            mDevice.status = Device.STATUS_UPGRADE_ING;
                             mAdapter.notifyDataSetChanged();
                             try {
                                 boolean canUpgrade = canUpgrade(version, tv_version.getText().toString());
@@ -426,21 +437,21 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                                         ToastUtils.showToast(UpgradeActivity.this, "CRC校验异常");
                                     }
                                 } else {
-                                    if (devices.isEmpty())
-                                        return;
-                                    isError();
+//                                    if (devices.isEmpty())
+//                                        return;
+//                                    isError();
                                     ToastUtils.showToast(UpgradeActivity.this, "不允许升级");
                                 }
                             } catch (Exception e) {
-                                if (devices.isEmpty())
-                                    return;
-                                isError();
+//                                if (devices.isEmpty())
+//                                    return;
+//                                isError();
                                 ToastUtils.showToast(UpgradeActivity.this, "比较版本失败");
                             }
                         } else {
-                            if (devices.isEmpty())
-                                return;
-                            isError();
+//                            if (devices.isEmpty())
+//                                return;
+//                            isError();
                             ToastUtils.showToast(UpgradeActivity.this, "获取手环固件版本号失败");
                         }
 
@@ -467,15 +478,15 @@ public class UpgradeActivity extends Activity implements OnClickListener {
         }
     };
 
-    private void isError() {
-        Device device = devices.get(0);
-        if (devicesMaps.containsKey(device.address)) {
-            removeDevice();
-            mAdapter.notifyDataSetChanged();
-            // 关闭手环并删除
-            connDevice();
-        }
-    }
+//    private void isError() {
+//        Device device = devices.get(0);
+//        if (devicesMaps.containsKey(device.address)) {
+//            removeDevice();
+//            mAdapter.notifyDataSetChanged();
+//            // 关闭手环并删除
+//            connDevice(device);
+//        }
+//    }
 
     private boolean canUpgrade(String srcVersion, String targetVersion) throws Exception {
         try {
@@ -539,19 +550,19 @@ public class UpgradeActivity extends Activity implements OnClickListener {
     @OnClick({R.id.btn_upgrade, R.id.btn_refresh, R.id.btn_file})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btn_upgrade:
-                if (TextUtils.isEmpty(tv_file_name.getText().toString())) {
-                    ToastUtils.showToast(this, "请先选择固件文件");
-                    return;
-                }
-                btn_upgrade.setEnabled(false);
-                String overTime = etOverTime.getText().toString();
-                String filterName = etFilterName.getText().toString();
-                SPUtiles.setStringValue("overTime", overTime);
-                SPUtiles.setStringValue("filterName", filterName);
-                mOverTime = TextUtils.isEmpty(overTime) ? 2 * 1000 : Integer.parseInt(overTime) * 1000;
-                connDevice();
-                break;
+//            case R.id.btn_upgrade:
+//                if (TextUtils.isEmpty(tv_file_name.getText().toString())) {
+//                    ToastUtils.showToast(this, "请先选择固件文件");
+//                    return;
+//                }
+//                btn_upgrade.setEnabled(false);
+//                String overTime = etOverTime.getText().toString();
+//                String filterName = etFilterName.getText().toString();
+//                SPUtiles.setStringValue("overTime", overTime);
+//                SPUtiles.setStringValue("filterName", filterName);
+//                mOverTime = TextUtils.isEmpty(overTime) ? 2 * 1000 : Integer.parseInt(overTime) * 1000;
+//                connDevice(device);
+//                break;
             case R.id.btn_refresh:
                 mDialog = ProgressDialog.show(UpgradeActivity.this, null,
                         getString(R.string.scan_device), false, false);
@@ -564,8 +575,8 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                 SPUtiles.setStringValue("scanPeriod", etScanPeriod.getText().toString());
                 String filterRssi = etFilterRssi.getText().toString();
                 SPUtiles.setStringValue("filterRssi", filterRssi);
-                String filterVersion = et_filter_version.getText().toString();
-                SPUtiles.setStringValue("filterVersion", filterVersion);
+//                String filterVersion = et_filter_version.getText().toString();
+//                SPUtiles.setStringValue("filterVersion", filterVersion);
                 mFilterRssi = TextUtils.isEmpty(filterRssi) ? -96 : Integer.parseInt(filterRssi);
                 break;
             case R.id.btn_file:
@@ -605,14 +616,10 @@ public class UpgradeActivity extends Activity implements OnClickListener {
 
     private void connDevice() {
         mBtService.disConnectBle();
-        if (devices.isEmpty()) {
-            return;
-        }
         mDialog = ProgressDialog.show(UpgradeActivity.this, null,
                 getString(R.string.match_device), false, false);
-        final Device device = devices.get(0);
-        mBtService.connectBle(device.address);
-        device.status = Device.STATUS_CONN_ING;
+        mBtService.connectBle(mDevice.address);
+        mDevice.status = Device.STATUS_CONN_ING;
         mAdapter.notifyDataSetChanged();
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -620,46 +627,20 @@ public class UpgradeActivity extends Activity implements OnClickListener {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (devices.isEmpty())
-                            return;
-                        if (devicesMaps.containsKey(device.address) && !device.address.equals(mConnDeviceAddress)) {
-                            removeDevice();
-                            mAdapter.notifyDataSetChanged();
+//                        if (devices.isEmpty())
+//                            return;
+                        if (mDevice.status == 1) {
+//                            removeDevice();
+//                            mAdapter.notifyDataSetChanged();
                             // 连接超时
                             LogModule.i("连接超时...");
                             ToastUtils.showToast(UpgradeActivity.this, "连接超时");
                             if (mDialog != null)
                                 mDialog.dismiss();
-                            // 关闭手环并删除
-                            connDevice();
-                        }
-                    }
-                });
-            }
-        }, mOverTime);
-    }
-
-    private void upgradeDevice(final Device device) {
-        mDialog = ProgressDialog.show(UpgradeActivity.this, null,
-                getString(R.string.upgrade_device), false, false);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (devices.isEmpty())
-                            return;
-                        if (devicesMaps.containsKey(device.address)) {
-                            removeDevice();
+                            mDevice.status = Device.STATUS_CONN_FALSE;
                             mAdapter.notifyDataSetChanged();
-                            // 连接超时
-                            LogModule.i("关闭超时...");
-                            ToastUtils.showToast(UpgradeActivity.this, "关闭超时");
-                            if (mDialog != null)
-                                mDialog.dismiss();
                             // 关闭手环并删除
-                            // connDevice();
+//                            connDevice();
                         }
                     }
                 });
@@ -667,10 +648,53 @@ public class UpgradeActivity extends Activity implements OnClickListener {
         }, mOverTime);
     }
 
+//    private void upgradeDevice(final Device device) {
+//        mDialog = ProgressDialog.show(UpgradeActivity.this, null,
+//                getString(R.string.upgrade_device), false, false);
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        if (devices.isEmpty())
+//                            return;
+//                        if (devicesMaps.containsKey(device.address)) {
+//                            removeDevice();
+//                            mAdapter.notifyDataSetChanged();
+//                            // 连接超时
+//                            LogModule.i("关闭超时...");
+//                            ToastUtils.showToast(UpgradeActivity.this, "关闭超时");
+//                            if (mDialog != null)
+//                                mDialog.dismiss();
+//                            // 关闭手环并删除
+//                            // connDevice();
+//                        }
+//                    }
+//                });
+//            }
+//        }, mOverTime);
+//    }
 
-    private synchronized void removeDevice() {
-        Device device = devices.get(0);
-        devices.remove(device);
-        devicesMaps.remove(device.address);
+
+//    private synchronized void removeDevice() {
+//        Device device = devices.get(0);
+//        devices.remove(device);
+//        devicesMaps.remove(device.address);
+//    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (TextUtils.isEmpty(tv_file_name.getText().toString())) {
+            ToastUtils.showToast(this, "请先选择固件文件");
+            return;
+        }
+        mDevice = (Device) parent.getItemAtPosition(position);
+        String overTime = etOverTime.getText().toString();
+        String filterName = etFilterName.getText().toString();
+        SPUtiles.setStringValue("overTime", overTime);
+        SPUtiles.setStringValue("filterName", filterName);
+        mOverTime = TextUtils.isEmpty(overTime) ? 2 * 1000 : Integer.parseInt(overTime) * 1000;
+        connDevice();
     }
 }
