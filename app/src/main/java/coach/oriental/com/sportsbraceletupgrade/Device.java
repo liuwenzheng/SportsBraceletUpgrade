@@ -17,9 +17,9 @@ public class Device implements Parcelable, Comparable<Device> {
      */
     public static final int STATUS_UPGRADE_ING = 2;
     /**
-     * 获取版本号
+     * CRC校验
      */
-    public static final int STATUS_GET_VERSION = 3;
+    public static final int STATUS_CRC = 3;
     /**
      * 升级成功
      */

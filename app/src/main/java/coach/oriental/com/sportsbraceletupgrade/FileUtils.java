@@ -151,18 +151,18 @@ public class FileUtils {
         return null;
     }
 
-    public static String[] getVersion(String filePath) throws Exception {
-        File file = new File(filePath);
-        try {
-            String fileName = file.getName().split("\\.")[0];
-
-            String[] s = new String[3];
-            s[0] = fileName.split("_")[1];
-            s[1] = fileName.split("_")[2];
-            s[2] = fileName.split("_")[3];
-            return s;
-        } catch (Exception e) {
-            throw e;
-        }
-    }
+//    public static String[] getVersion(String filePath) throws Exception {
+//        File file = new File(filePath);
+//        try {
+//            String fileName = file.getName().split("\\.")[0];
+//
+//            String[] s = new String[3];
+//            s[0] = fileName.split("_")[1];
+//            s[1] = fileName.split("_")[2];
+//            s[2] = fileName.split("_")[3];
+//            return s;
+//        } catch (Exception e) {
+//            throw e;
+//        }
+//    }
 }

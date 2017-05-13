@@ -63,8 +63,8 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
 //    EditText et_filter_version;
     @InjectView(R.id.tv_file_name)
     TextView tv_file_name;
-    @InjectView(R.id.tv_version)
-    TextView tv_version;
+//    @InjectView(R.id.tv_version)
+//    TextView tv_version;
     private DeviceAdapter mAdapter;
     private ArrayList<Device> devices;
     private BTService mBtService;
@@ -317,14 +317,25 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
                         ToastUtils.showToast(UpgradeActivity.this, "配对成功");
                         if (mDialog != null)
                             mDialog.dismiss();
-                        mDialog = ProgressDialog.show(UpgradeActivity.this, null, "获取版本号", false, false);
-                        mDevice.status = Device.STATUS_GET_VERSION;
-                        mAdapter.notifyDataSetChanged();
-                        mBtService.getVersion();
+//                        mDialog = ProgressDialog.show(UpgradeActivity.this, null, "获取版本号", false, false);
+//                        mDevice.status = Device.STATUS_CRC;
+//                        mAdapter.notifyDataSetChanged();
+//                        mBtService.getVersion();
                         // 升级固件
                         // upgradeDevice(device);
                         // device.status = Device.STATUS_UPGRADE_ING;
                         // synData();
+                        mDevice.status = Device.STATUS_CRC;
+                        mAdapter.notifyDataSetChanged();
+                        try {
+                            mDialog = ProgressDialog.show(UpgradeActivity.this, null, "CRC校验", false, false);
+                            mBtService.getCRCResult(tv_file_name.getText().toString());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            mDevice.status = Device.STATUS_CONN_FALSE;
+                            mAdapter.notifyDataSetChanged();
+                            ToastUtils.showToast(UpgradeActivity.this, "CRC校验异常");
+                        }
                     }
                 }
                 if (BTConstants.ACTION_ACK.equals(intent.getAction())) {
@@ -373,6 +384,8 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
                                 }
                             }).start();
 //                                ToastUtils.showToast(UpgradeActivity.this, "接收到的序号：" + Utils.toInt(index));
+                            mDevice.status = Device.STATUS_UPGRADE_ING;
+                            mAdapter.notifyDataSetChanged();
                             ToastUtils.showToast(UpgradeActivity.this, "开始发送数据包");
                         }
                         return;
@@ -417,45 +430,39 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
                         ToastUtils.showToast(UpgradeActivity.this, "CRC校验正常，开始升级");
                         return;
                     }
-                    if (ack == BTConstants.HEADER_BACK_ACK) {
-                        if (mDialog != null)
-                            mDialog.dismiss();
-                        String version = SPUtiles.getStringValue(BTConstants.SP_KEY_DEVICE_VERSION, "");
-                        if (!TextUtils.isEmpty(version)) {
-                            mDevice.version = version;
-                            mDevice.status = Device.STATUS_UPGRADE_ING;
-                            mAdapter.notifyDataSetChanged();
-                            try {
-                                boolean canUpgrade = canUpgrade(version, tv_version.getText().toString());
-                                if (canUpgrade) {
-                                    // ToastUtils.showToast(UpgradeActivity.this, "可以升级");
-                                    try {
-                                        mDialog = ProgressDialog.show(UpgradeActivity.this, null, "CRC校验", false, false);
-                                        mBtService.getCRCResult(tv_file_name.getText().toString());
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                        ToastUtils.showToast(UpgradeActivity.this, "CRC校验异常");
-                                    }
-                                } else {
+//                    if (ack == BTConstants.HEADER_BACK_ACK) {
+//                        if (mDialog != null)
+//                            mDialog.dismiss();
+//                        String version = SPUtiles.getStringValue(BTConstants.SP_KEY_DEVICE_VERSION, "");
+//                        if (!TextUtils.isEmpty(version)) {
+//                            mDevice.version = version;
+//                            mDevice.status = Device.STATUS_UPGRADE_ING;
+//                            mAdapter.notifyDataSetChanged();
+//                            try {
+//                                boolean canUpgrade = canUpgrade(version, tv_version.getText().toString());
+//                                if (canUpgrade) {
+                    // ToastUtils.showToast(UpgradeActivity.this, "可以升级");
+
+//                                } else {
 //                                    if (devices.isEmpty())
 //                                        return;
 //                                    isError();
-                                    ToastUtils.showToast(UpgradeActivity.this, "不允许升级");
-                                }
-                            } catch (Exception e) {
+//                                    ToastUtils.showToast(UpgradeActivity.this, "不允许升级");
+//                                }
+//                            } catch (Exception e) {
 //                                if (devices.isEmpty())
 //                                    return;
 //                                isError();
-                                ToastUtils.showToast(UpgradeActivity.this, "比较版本失败");
-                            }
-                        } else {
+//                                ToastUtils.showToast(UpgradeActivity.this, "比较版本失败");
+//                            }
+//                        } else {
 //                            if (devices.isEmpty())
 //                                return;
 //                            isError();
-                            ToastUtils.showToast(UpgradeActivity.this, "获取手环固件版本号失败");
-                        }
+//                            ToastUtils.showToast(UpgradeActivity.this, "获取手环固件版本号失败");
+//                        }
 
-                    }
+//                    }
 
 //                    if (ack == 0x96) {
 //                        if (devices.isEmpty())
@@ -488,41 +495,41 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
 //        }
 //    }
 
-    private boolean canUpgrade(String srcVersion, String targetVersion) throws Exception {
-        try {
-            String[] src = srcVersion.split("\\.");
-            String[] target = targetVersion.split("\\.");
-            if (!src[0].equals(target[0])) {
-                return false;
-            } else {
-                String srcHeight = src[1].substring(0, 1);
-                String srcLow = src[1].substring(1, 2);
-                String tarHeight = target[1].substring(0, 1);
-                String tarLow = target[1].substring(1, 2);
-                if (!srcHeight.equals(tarHeight)) {
-                    return false;
-                } else {
-                    int src2 = Integer.parseInt(srcLow, 16);
-                    int target2 = Integer.parseInt(tarLow, 16);
-                    if (target2 > src2) {
-                        return true;
-                    } else if (target2 < src2) {
-                        return false;
-                    } else {
-                        int src3 = Integer.parseInt(src[2], 16);
-                        int target3 = Integer.parseInt(target[2], 16);
-                        if (target3 > src3) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw e;
-        }
-    }
+//    private boolean canUpgrade(String srcVersion, String targetVersion) throws Exception {
+//        try {
+//            String[] src = srcVersion.split("\\.");
+//            String[] target = targetVersion.split("\\.");
+//            if (!src[0].equals(target[0])) {
+//                return false;
+//            } else {
+//                String srcHeight = src[1].substring(0, 1);
+//                String srcLow = src[1].substring(1, 2);
+//                String tarHeight = target[1].substring(0, 1);
+//                String tarLow = target[1].substring(1, 2);
+//                if (!srcHeight.equals(tarHeight)) {
+//                    return false;
+//                } else {
+//                    int src2 = Integer.parseInt(srcLow, 16);
+//                    int target2 = Integer.parseInt(tarLow, 16);
+//                    if (target2 > src2) {
+//                        return true;
+//                    } else if (target2 < src2) {
+//                        return false;
+//                    } else {
+//                        int src3 = Integer.parseInt(src[2], 16);
+//                        int target3 = Integer.parseInt(target[2], 16);
+//                        if (target3 > src3) {
+//                            return true;
+//                        } else {
+//                            return false;
+//                        }
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            throw e;
+//        }
+//    }
 
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -601,14 +608,14 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
                     //得到uri，后面就是将uri转化成file的过程。
                     Uri uri = data.getData();
                     String path = FileUtils.getPath(this, uri);
-                    try {
-                        String[] version = FileUtils.getVersion(path);
-                        tv_version.setText(String.format("%s.%s.%s", version[0], version[1], version[2]));
+//                    try {
+//                        String[] version = FileUtils.getVersion(path);
+//                        tv_version.setText(String.format("%s.%s.%s", version[0], version[1], version[2]));
                         Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
                         tv_file_name.setText(path);
-                    } catch (Exception e) {
-                        Toast.makeText(this, "无法获取待升级固件版本号", Toast.LENGTH_SHORT).show();
-                    }
+//                    } catch (Exception e) {
+//                        Toast.makeText(this, "无法获取待升级固件版本号", Toast.LENGTH_SHORT).show();
+//                    }
                     break;
             }
         }

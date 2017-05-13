@@ -68,8 +68,8 @@ public class DeviceAdapter extends BaseAdapter {
             holder.tv_device_status.setText("正在升级");
         } else if (device.status == Device.STATUS_CONN_ING) {
             holder.tv_device_status.setText("正在连接");
-        } else if (device.status == Device.STATUS_GET_VERSION) {
-            holder.tv_device_status.setText("正在获取版本号");
+        } else if (device.status == Device.STATUS_CRC) {
+            holder.tv_device_status.setText("正在CRC校验");
         } else if (device.status == Device.STATUS_UPGRADE_SUCCESS) {
             holder.tv_device_status.setText("升级成功");
         }
