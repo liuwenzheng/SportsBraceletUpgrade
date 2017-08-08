@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">固件升级程序</string>
+    <string name="scan_device">正在扫描手环</string>
+    <string name="match_device">手机与手环正在配对</string>
+
+
+    <string name="upgrade">开始升级</string>
+    <string name="refresh">刷新</string>
+    <string name="name">名称</string>
+    <string name="rssi">强度</string>
+    <string name="version">版本号</string>
+    <string name="status">状态</string>
+    <string name="select_file">选择文件</string>
+    <string name="timeout">超时</string>
+    <string name="connect">未连接</string>
+    <string name="connecting">正在升级</string>
+    <string name="connected">正在连接</string>
+    <string name="crc_verify">正在CRC校验</string>
+    <string name="upgrade_success">升级成功</string>
+    <string name="upgrade_timeout">升级超时</string>
+    <string name="upgrade_crc_error">升级校验码错误</string>
+    <string name="upgrade_file_error">升级文件错误</string>
+    <string name="upgrade_unknow_error">未知错误</string>
+    <string name="updating">正在升级...</string>
+    <string name="crc_success_upgrade">CRC校验正常，开始升级</string>
+    <string name="connection_failed">配对失败</string>
+    <string name="connection_successed">配对成功</string>
+    <string name="crc_verify_start">CRC校验</string>
+    <string name="crc_verify_error">CRC校验异常</string>
+    <string name="upgrade_error">发送包异常</string>
+    <string name="start_send_package">开始发送数据包</string>
+    <string name="select_file_first">请选择文件!</string>
+    <string name="install_file_manager_app">请安装文件管理器</string>
+    <string name="select_upgrade_file_first">请先选择固件文件</string>
+</resources>

@@ -304,7 +304,7 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
 //                    isError();
                     mDevice.status = Device.STATUS_CONN_FALSE;
                     mAdapter.notifyDataSetChanged();
-                    ToastUtils.showToast(UpgradeActivity.this, "配对失败");
+                    ToastUtils.showToast(UpgradeActivity.this, getString(R.string.connection_failed));
                 }
                 if (BTConstants.ACTION_DISCOVER_SUCCESS.equals(intent
                         .getAction())) {
@@ -314,7 +314,7 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
                         mAdapter.notifyDataSetChanged();
                         // 连接超时
                         LogModule.i("配对成功...");
-                        ToastUtils.showToast(UpgradeActivity.this, "配对成功");
+                        ToastUtils.showToast(UpgradeActivity.this, getString(R.string.connection_successed));
                         if (mDialog != null)
                             mDialog.dismiss();
 //                        mDialog = ProgressDialog.show(UpgradeActivity.this, null, "获取版本号", false, false);
@@ -328,13 +328,13 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
                         mDevice.status = Device.STATUS_CRC;
                         mAdapter.notifyDataSetChanged();
                         try {
-                            mDialog = ProgressDialog.show(UpgradeActivity.this, null, "CRC校验", false, false);
+                            mDialog = ProgressDialog.show(UpgradeActivity.this, null, getString(R.string.crc_verify_start), false, false);
                             mBtService.getCRCResult(tv_file_name.getText().toString());
                         } catch (Exception e) {
                             e.printStackTrace();
                             mDevice.status = Device.STATUS_CONN_FALSE;
                             mAdapter.notifyDataSetChanged();
-                            ToastUtils.showToast(UpgradeActivity.this, "CRC校验异常");
+                            ToastUtils.showToast(UpgradeActivity.this, getString(R.string.crc_verify_error));
                         }
                     }
                 }
@@ -374,7 +374,7 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
                                                 mAdapter.notifyDataSetChanged();
                                                 if (mDialog != null)
                                                     mDialog.dismiss();
-                                                ToastUtils.showToast(UpgradeActivity.this, "发送包异常");
+                                                ToastUtils.showToast(UpgradeActivity.this, getString(R.string.upgrade_error));
 //                                                if (devices.isEmpty())
 //                                                    return;
 //                                                isError();
@@ -386,7 +386,7 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
 //                                ToastUtils.showToast(UpgradeActivity.this, "接收到的序号：" + Utils.toInt(index));
                             mDevice.status = Device.STATUS_UPGRADE_ING;
                             mAdapter.notifyDataSetChanged();
-                            ToastUtils.showToast(UpgradeActivity.this, "开始发送数据包");
+                            ToastUtils.showToast(UpgradeActivity.this, getString(R.string.start_send_package));
                         }
                         return;
                     }
@@ -396,19 +396,19 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
                         int result = intent.getIntExtra(BTConstants.EXTRA_KEY_PACKAGE_RESULT, -1);
                         switch (result) {
                             case 0:
-                                ToastUtils.showToast(UpgradeActivity.this, "升级成功");
+                                ToastUtils.showToast(UpgradeActivity.this, getString(R.string.upgrade_success));
                                 break;
                             case 1:
-                                ToastUtils.showToast(UpgradeActivity.this, "升级超时");
+                                ToastUtils.showToast(UpgradeActivity.this, getString(R.string.upgrade_timeout));
                                 break;
                             case 2:
-                                ToastUtils.showToast(UpgradeActivity.this, "升级校验码错误");
+                                ToastUtils.showToast(UpgradeActivity.this, getString(R.string.upgrade_crc_error));
                                 break;
                             case 3:
-                                ToastUtils.showToast(UpgradeActivity.this, "升级文件错误");
+                                ToastUtils.showToast(UpgradeActivity.this, getString(R.string.upgrade_file_error));
                                 break;
                             default:
-                                ToastUtils.showToast(UpgradeActivity.this, "未知错误");
+                                ToastUtils.showToast(UpgradeActivity.this, getString(R.string.upgrade_unknow_error));
                                 break;
                         }
                         if (result != 0) {
@@ -426,8 +426,8 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
                     if (ack == BTConstants.HEADER_CRC) {
                         if (mDialog != null)
                             mDialog.dismiss();
-                        mDialog = ProgressDialog.show(UpgradeActivity.this, null, "正在升级...", false, false);
-                        ToastUtils.showToast(UpgradeActivity.this, "CRC校验正常，开始升级");
+                        mDialog = ProgressDialog.show(UpgradeActivity.this, null, getString(R.string.updating), false, false);
+                        ToastUtils.showToast(UpgradeActivity.this, getString(R.string.crc_success_upgrade));
                         return;
                     }
 //                    if (ack == BTConstants.HEADER_BACK_ACK) {
@@ -591,9 +591,9 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
                 intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 try {
-                    startActivityForResult(Intent.createChooser(intent, "请选择文件!"), REQUEST_CODE_FILE);
+                    startActivityForResult(Intent.createChooser(intent, getString(R.string.select_file_first)), REQUEST_CODE_FILE);
                 } catch (ActivityNotFoundException ex) {
-                    ToastUtils.showToast(this, "请安装文件管理器");
+                    ToastUtils.showToast(this, getString(R.string.install_file_manager_app));
                 }
                 break;
         }
@@ -641,7 +641,7 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
 //                            mAdapter.notifyDataSetChanged();
                             // 连接超时
                             LogModule.i("连接超时...");
-                            ToastUtils.showToast(UpgradeActivity.this, "连接超时");
+                            ToastUtils.showToast(UpgradeActivity.this, getString(R.string.timeout));
                             if (mDialog != null)
                                 mDialog.dismiss();
                             mDevice.status = Device.STATUS_CONN_FALSE;
@@ -693,7 +693,7 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (TextUtils.isEmpty(tv_file_name.getText().toString())) {
-            ToastUtils.showToast(this, "请先选择固件文件");
+            ToastUtils.showToast(this, getString(R.string.select_upgrade_file_first));
             return;
         }
         mDevice = (Device) parent.getItemAtPosition(position);

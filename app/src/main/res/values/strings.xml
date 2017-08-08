@@ -1,23 +1,35 @@
 <resources>
-    <string name="app_name">固件升级程序</string>
-    <string name="scan_device">正在扫描手环</string>
-    <string name="match_device">手机与手环正在配对</string>
-    <string name="upgrade_device">正在进行升级</string>
+    <string name="app_name">Upgrade</string>
+    <string name="scan_device">Scan</string>
+    <string name="match_device">Pairing</string>
 
 
-    <string name="scan">扫描手环</string>
-    <string name="upgrade">开始升级</string>
-    <string name="clear">清空列表</string>
-    <string name="write_sn">发送SN</string>
-    <string name="read_sn">读取SN</string>
-    <string name="setting_device_conn_success">配对成功</string>
-    <string name="setting_device_conn_failure">配对失败</string>
-    <string name="setting_device_search">正在搜索手环</string>
-    <string name="device_size">手环数量：%1$s个</string>
-    <string name="sync_time_success">同步时间成功</string>
-    <string name="sync_touch_success">复位按键成功</string>
-    <string name="sync_sleep_success">设置休眠成功</string>
-    <string name="sync_sn_success">烧码成功</string>
-    <string name="read_sn_back">读取SN返回值为：%1$s</string>
-    <string name="write_sn_back">发送SN返回值为：%1$s</string>
+    <string name="upgrade">Upgrade</string>
+    <string name="refresh">Scan</string>
+    <string name="name">Name</string>
+    <string name="rssi">RSSI</string>
+    <string name="version">Version</string>
+    <string name="status">Status</string>
+    <string name="select_file">Select file</string>
+    <string name="timeout">Timeout</string>
+    <string name="connect">connect</string>
+    <string name="connecting">updating</string>
+    <string name="connected">connected</string>
+    <string name="crc_verify">CRC Verify</string>
+    <string name="upgrade_success">the upgrade is successful</string>
+    <string name="upgrade_timeout">the upgrade is timeout</string>
+    <string name="upgrade_crc_error">the crc is error</string>
+    <string name="upgrade_file_error">the upgrade file is erro</string>
+    <string name="upgrade_unknow_error">unknow error</string>
+    <string name="updating">updating...</string>
+    <string name="crc_success_upgrade">the crc is success,start upgrade</string>
+    <string name="connection_failed">the connection is failed</string>
+    <string name="connection_successed">the connection is successful</string>
+    <string name="crc_verify_start">crc verity</string>
+    <string name="crc_verify_error">crc error</string>
+    <string name="upgrade_error">upgrade error</string>
+    <string name="start_send_package">start send package</string>
+    <string name="select_file_first">select file first!</string>
+    <string name="install_file_manager_app">install file manager app</string>
+    <string name="select_upgrade_file_first">select upgrade file first</string>
 </resources>

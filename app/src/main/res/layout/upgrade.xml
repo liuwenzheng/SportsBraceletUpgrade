@@ -31,7 +31,7 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:paddingTop="5dp"
-            android:text="刷新" />
+            android:text="@string/refresh" />
 
         <EditText
             android:id="@+id/et_scan_period"
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
             android:gravity="left"
-            android:text="名称"
+            android:text="@string/name"
             android:textSize="20sp" />
 
         <TextView
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
             android:gravity="center"
-            android:text="强度"
+            android:text="@string/rssi"
             android:textSize="20sp" />
 
         <TextView
@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
             android:gravity="center"
-            android:text="版本号"
+            android:text="@string/version"
             android:textSize="20sp" />
 
         <TextView
@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
             android:gravity="right"
-            android:text="状态"
+            android:text="@string/status"
             android:textSize="20sp" />
     </LinearLayout>
 
@@ -99,7 +99,7 @@
             android:id="@+id/btn_file"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="选择文件"
+            android:text="@string/select_file"
             android:textSize="20sp" />
 
         <TextView
@@ -157,7 +157,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="名字"
+                android:text="@string/name"
                 android:textSize="20sp" />
 
             <EditText
@@ -177,7 +177,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="信号"
+                android:text="@string/rssi"
                 android:textSize="20sp" />
 
             <EditText
@@ -200,7 +200,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="超时"
+                android:text="@string/timeout"
                 android:textSize="20sp" />
 
             <EditText

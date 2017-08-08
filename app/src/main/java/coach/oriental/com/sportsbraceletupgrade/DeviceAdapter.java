@@ -63,15 +63,15 @@ public class DeviceAdapter extends BaseAdapter {
         }
         holder.tv_device_name.setText(device.name);
         if (device.status == Device.STATUS_CONN_FALSE) {
-            holder.tv_device_status.setText("未连接");
+            holder.tv_device_status.setText(R.string.connect);
         } else if (device.status == Device.STATUS_UPGRADE_ING) {
-            holder.tv_device_status.setText("正在升级");
+            holder.tv_device_status.setText(R.string.connecting);
         } else if (device.status == Device.STATUS_CONN_ING) {
-            holder.tv_device_status.setText("正在连接");
+            holder.tv_device_status.setText(R.string.connected);
         } else if (device.status == Device.STATUS_CRC) {
-            holder.tv_device_status.setText("正在CRC校验");
+            holder.tv_device_status.setText(R.string.crc_verify);
         } else if (device.status == Device.STATUS_UPGRADE_SUCCESS) {
-            holder.tv_device_status.setText("升级成功");
+            holder.tv_device_status.setText(R.string.upgrade_success);
         }
         holder.tv_device_rssi.setText(device.rssi + "");
         holder.tv_device_version.setText(device.version);
