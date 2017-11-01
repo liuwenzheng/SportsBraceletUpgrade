@@ -63,7 +63,7 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
 //    EditText et_filter_version;
     @InjectView(R.id.tv_file_name)
     TextView tv_file_name;
-//    @InjectView(R.id.tv_version)
+    //    @InjectView(R.id.tv_version)
 //    TextView tv_version;
     private DeviceAdapter mAdapter;
     private ArrayList<Device> devices;
@@ -123,6 +123,7 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
         etFilterName.setText(SPUtiles.getStringValue("filterName", ""));
         etScanPeriod.setText(SPUtiles.getStringValue("scanPeriod", "5"));
         etFilterRssi.setText(SPUtiles.getStringValue("filterRssi", "-96"));
+        tv_file_name.setText(SPUtiles.getStringValue("firmware_path", ""));
 //        et_filter_version.setText(SPUtiles.getStringValue("filterVersion", ""));
     }
 
@@ -608,11 +609,12 @@ public class UpgradeActivity extends Activity implements OnClickListener, Adapte
                     //得到uri，后面就是将uri转化成file的过程。
                     Uri uri = data.getData();
                     String path = FileUtils.getPath(this, uri);
+                    SPUtiles.setStringValue("firmware_path", path);
 //                    try {
 //                        String[] version = FileUtils.getVersion(path);
 //                        tv_version.setText(String.format("%s.%s.%s", version[0], version[1], version[2]));
-                        Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
-                        tv_file_name.setText(path);
+                    Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+                    tv_file_name.setText(path);
 //                    } catch (Exception e) {
 //                        Toast.makeText(this, "无法获取待升级固件版本号", Toast.LENGTH_SHORT).show();
 //                    }
